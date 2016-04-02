@@ -39,7 +39,7 @@ paths:
         200:
           description: "Пользователь добавлен в спам"
           schema:
-            $ref: "#/definitions/UserInfo"
+            $ref: "#/definitions/UserDto"
         401:
           description: "Пользователь не авторизован"
           schema:
@@ -77,11 +77,11 @@ paths:
         200:
           description: "Вы состоите в группе"
           schema:
-            $ref: "#/definitions/GroupInfoResponse"
+            $ref: "#/definitions/GroupInfoResponseDto"
         202:
           description: "Вы не вошли в группу"
           schema:
-            $ref: "#/definitions/GroupInfoResponse"
+            $ref: "#/definitions/GroupInfoResponseDto"
         401:
           description: "Пользователь не авторизован"
           schema:
@@ -105,7 +105,7 @@ paths:
         description: "Информация о группе пользователей"
         required: true
         schema:
-          $ref: "#/definitions/PostGroupInfo"
+          $ref: "#/definitions/PostGroupInfoDto"
       - name: "Auth-Token"
         in: "header"
         description: "Токен авторизации"
@@ -115,7 +115,7 @@ paths:
         201:
           description: "Группа создана"
           schema:
-            $ref: "#/definitions/GroupInfoResponse"
+            $ref: "#/definitions/GroupInfoResponseDto"
         401:
           description: "Пользователь не авторизован"
           schema:
@@ -143,7 +143,7 @@ paths:
         200:
           description: "Долговые отношения"
           schema:
-            $ref: "#/definitions/DebtsArrayResponse"
+            $ref: "#/definitions/DebtsArrayResponseDto"
         401:
           description: "Пользователь не авторизован"
           schema:
@@ -171,7 +171,7 @@ paths:
         description: "Информация о принятом долге"
         required: true
         schema:
-          $ref: "#/definitions/DebtPut"
+          $ref: "#/definitions/DebtPutDto"
       - name: "Auth-Token"
         in: "header"
         description: "Токен авторизации"
@@ -181,7 +181,7 @@ paths:
         202:
           description: "Долговые отношения приняты"
           schema:
-            $ref: "#/definitions/DebtResponse"
+            $ref: "#/definitions/DebtResponseDto"
         401:
           description: "Пользователь не авторизован"
           schema:
@@ -209,7 +209,7 @@ paths:
         description: "Долговые отношения"
         required: true
         schema:
-          $ref: "#/definitions/PostDebt"
+          $ref: "#/definitions/PostDebtDto"
       - name: "Auth-Token"
         in: "header"
         description: "Токен авторизации"
@@ -219,7 +219,7 @@ paths:
         201:
           description: "Отправлена заявка для создания долговых отношений"
           schema:
-            $ref: "#/definitions/DebtResponse"
+            $ref: "#/definitions/DebtResponseDto"
         401:
           description: "Пользователь не авторизован"
           schema:
@@ -283,7 +283,7 @@ paths:
         in: "body"
         description: "Информация об изменении долговых отношениях"
         schema:
-          $ref: "#/definitions/DebtChange"
+          $ref: "#/definitions/DebtChangeDto"
       - name: "Auth-Token"
         in: "header"
         description: "Токен авторизации"
@@ -293,7 +293,7 @@ paths:
         200:
           description: "Отправлена заявка для изменения долговых отношений"
           schema:
-            $ref: "#/definitions/DebtResponse"
+            $ref: "#/definitions/DebtResponseDto"
         401:
           description: "Пользователь не авторизован"
           schema:
@@ -447,12 +447,6 @@ paths:
           schema:
             $ref: "#/definitions/500_ErrorDto"
 definitions:
-  TokenResponseDto:
-    type: "object"
-    properties:
-      meta:
-        description: "Информация об ответе"
-        $ref: "#/definitions/MetaDto"
   UniqueResponseDto:
     type: "object"
     properties:
@@ -468,7 +462,7 @@ definitions:
       isUnique:
         type: "boolean"
         description: "Уникальность логина/телефона"
-  PostGroupInfo:
+  PostGroupInfoDto:
     type: "object"
     required:
     - "name"
@@ -480,15 +474,15 @@ definitions:
         description: "Название группы"
       userIdArray:
         description: "Массив пользователей"
-        $ref: "#/definitions/UserIdArray"
+        $ref: "#/definitions/UserIdArrayDto"
       message:
         type: "string"
         description: "Сообщение группы"
       createrId:
         description: "Идентификатор создателя группы"
         type: "object"
-        $ref: "#/definitions/UserId"
-  GroupInfoResponse:
+        $ref: "#/definitions/UserIdDto"
+  GroupInfoResponseDto:
     type: "object"
     required:
     - "id"
@@ -504,34 +498,19 @@ definitions:
         description: "Название группы"
       userArray:
         description: "Массив пользователей"
-        $ref: "#/definitions/UserArray"
+        $ref: "#/definitions/UserArrayDto"
       message:
         type: "string"
         description: "Сообщение группы"
       creater:
         type: "object"
-        $ref: "#/definitions/UserInfo"
+        $ref: "#/definitions/UserDto"
         description: "Создатель группы"
-  UserIdArray:
+  UserIdArrayDto:
     type: "array"
     items:
-      $ref: "#/definitions/UserId"
-  TokenResponse:
-    type: "object"
-    properties:
-      MetaDto:
-        description: "Информация об ответе"
-        $ref: "#/definitions/MetaDto"
-      data:
-        description: "Пользователь"
-        $ref: "#/definitions/Token"
-  Token:
-    type: "object"
-    properties:
-      token:
-        description: "Токен авторизации"
-        type: "string"
-  ErrorResponseMeta:
+      $ref: "#/definitions/UserIdDto"
+  ErrorResponseMetaDto:
     type: "object"
     properties:
       code:
@@ -563,7 +542,7 @@ definitions:
       password:
         type: "string"
         description: "Пароль пользователя"
-  UserInfo:
+  UserDto:
     type: "object"
     required:
     - "firstName"
@@ -581,7 +560,7 @@ definitions:
         type: "string"
       photoUrl:
         type: "string"
-  UserId:
+  UserIdDto:
     type: "object"
     required:
     - "userId"
@@ -597,8 +576,8 @@ definitions:
         $ref: "#/definitions/MetaDto"
       data:
         description: "Пользователь"
-        $ref: "#/definitions/UserInfo"
-  PostDebt:
+        $ref: "#/definitions/UserDto"
+  PostDebtDto:
     type: "object"
     required:
     - "receiverId"
@@ -616,7 +595,7 @@ definitions:
       comment:
         type: "string"
         description: "Комментарий к долговым отношениям"
-  Debt:
+  DebtDto:
     type: "object"
     required:
     - "id"
@@ -648,14 +627,14 @@ definitions:
       date:
         type: "string"
         description: "Дата создания долговых отношений"
-  DebtsArray:
+  DebtsArrayDto:
     type: "array"
     items:
-      $ref: "#/definitions/Debt"
-  UserArray:
+      $ref: "#/definitions/DebtDto"
+  UserArrayDto:
     type: "array"
     items:
-      $ref: "#/definitions/UserInfo"
+      $ref: "#/definitions/UserDto"
   MetaDto:
     type: "object"
     properties:
@@ -668,7 +647,7 @@ definitions:
     example:
       code: "200"
       status: "success"
-  DebtResponse:
+  DebtResponseDto:
     type: "object"
     properties:
       meta:
@@ -676,8 +655,8 @@ definitions:
         $ref: "#/definitions/MetaDto"
       data:
         description: "Долг"
-        $ref: "#/definitions/Debt"
-  DebtsArrayResponse:
+        $ref: "#/definitions/DebtDto"
+  DebtsArrayResponseDto:
     type: "object"
     properties:
       meta:
@@ -685,8 +664,8 @@ definitions:
         $ref: "#/definitions/MetaDto"
       data:
         description: "Долг"
-        $ref: "#/definitions/DebtsArray"
-  DebtPut:
+        $ref: "#/definitions/DebtsArrayDto"
+  DebtPutDto:
     type: "object"
     required:
     - "debtId"
@@ -697,7 +676,7 @@ definitions:
       action:
         type: "string"
         description: "Информация о принятии долговых отношений"
-  DebtChange:
+  DebtChangeDto:
     type: object
     properties:
       debtId:
@@ -711,7 +690,7 @@ definitions:
     properties:
       meta:
         description: "Информация об ответе"
-        $ref: "#/definitions/ErrorResponseMeta"
+        $ref: "#/definitions/ErrorResponseMetaDto"
     example:
       meta:
         code: 401
@@ -722,7 +701,7 @@ definitions:
     properties:
       meta:
         description: "Информация об ответе"
-        $ref: "#/definitions/ErrorResponseMeta"
+        $ref: "#/definitions/ErrorResponseMetaDto"
     example:
       meta:
         code: 403
@@ -733,7 +712,7 @@ definitions:
     properties:
       meta:
         description: "Информация об ответе"
-        $ref: "#/definitions/ErrorResponseMeta"
+        $ref: "#/definitions/ErrorResponseMetaDto"
     example:
       meta:
         code: 404
@@ -744,7 +723,7 @@ definitions:
     properties:
       meta:
         description: "Информация об ответе"
-        $ref: "#/definitions/ErrorResponseMeta"
+        $ref: "#/definitions/ErrorResponseMetaDto"
     example:
       meta:
         code: 500
