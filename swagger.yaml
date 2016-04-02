@@ -1,0 +1,752 @@
+---
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: "Dolgovik"
+host: "fsep-test.ru"
+basePath: "/servers/dolgovik-server"
+tags:
+- name: "user"
+  description: "Работа с пользователем"
+- name: "debts"
+  description: "Работа с долговыми отношениями"
+- name: "group"
+  description: "Работа с группами пользователей"
+- name: "registration"
+  description: "Регистрация и авторизация"
+schemes:
+- "http"
+produces:
+- "application/json"
+paths:
+  /spam/{id}:
+    post:
+      tags:
+      - "user"
+      summary: "Отправить в спам"
+      parameters:
+      - in: "path"
+        name: "id"
+        description: "Идентификатор оповещения (группы / долговых отношений / пользователя)"
+        required: true
+        type: "integer"
+      - name: "Auth-Token"
+        in: "header"
+        description: "Токен авторизации"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Пользователь добавлен в спам"
+          schema:
+            $ref: "#/definitions/UserInfo"
+        401:
+          description: "Пользователь не авторизован"
+          schema:
+            $ref: "#/definitions/401_ErrorDto"
+        404:
+          description: "Пользователь не найден"
+          schema:
+            $ref: "#/definitions/404_ErrorDto"
+        500:
+          description: "Внутренняя ошибка сервера"
+          schema:
+            $ref: "#/definitions/500_ErrorDto"
+  /groups/{group-id}:
+    put:
+      tags:
+      - "group"
+      summary: "Принять приглашение в группу"
+      parameters:
+      - in: "path"
+        name: "group-id"
+        description: "Идентификатор группы"
+        required: true
+        type: "integer"
+      - name: "Auth-Token"
+        in: "header"
+        description: "Токен авторизации"
+        required: true
+        type: "string"
+      - name: "accept"
+        in: "query"
+        required: true
+        description: "Решение пользователя"
+        type: "boolean"
+      responses:
+        200:
+          description: "Вы состоите в группе"
+          schema:
+            $ref: "#/definitions/GroupInfoResponse"
+        202:
+          description: "Вы не вошли в группу"
+          schema:
+            $ref: "#/definitions/GroupInfoResponse"
+        401:
+          description: "Пользователь не авторизован"
+          schema:
+            $ref: "#/definitions/401_ErrorDto"
+        404:
+          description: "Пользователь не найден"
+          schema:
+            $ref: "#/definitions/404_ErrorDto"
+        500:
+          description: "Внутренняя ошибка сервера"
+          schema:
+            $ref: "#/definitions/500_ErrorDto"
+  /groups:
+    post:
+      tags:
+      - "group"
+      summary: "Создание группы пользователей"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Информация о группе пользователей"
+        required: true
+        schema:
+          $ref: "#/definitions/PostGroupInfo"
+      - name: "Auth-Token"
+        in: "header"
+        description: "Токен авторизации"
+        required: true
+        type: "string"
+      responses:
+        201:
+          description: "Группа создана"
+          schema:
+            $ref: "#/definitions/GroupInfoResponse"
+        401:
+          description: "Пользователь не авторизован"
+          schema:
+            $ref: "#/definitions/401_ErrorDto"
+        404:
+          description: "Пользователь не найден"
+          schema:
+            $ref: "#/definitions/404_ErrorDto"
+        500:
+          description: "Внутренняя ошибка сервера"
+          schema:
+            $ref: "#/definitions/500_ErrorDto"
+  /debts:
+    get:
+      tags:
+      - "debts"
+      summary: "Получить список долговых отношений"
+      parameters:
+      - name: "Auth-Token"
+        in: "header"
+        description: "Токен авторизации"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Долговые отношения"
+          schema:
+            $ref: "#/definitions/DebtsArrayResponse"
+        401:
+          description: "Пользователь не авторизован"
+          schema:
+            $ref: "#/definitions/401_ErrorDto"
+        403:
+          description: "Данное действие для пользователя запрещенно"
+          schema:
+            $ref: "#/definitions/403_ErrorDto"
+        404:
+          description: "Пользователь не найден"
+          schema:
+            $ref: "#/definitions/404_ErrorDto"
+        500:
+          description: "Внутренняя ошибка сервера"
+          schema:
+            $ref: "#/definitions/500_ErrorDto"
+    put:
+      tags:
+      - "debts"
+      summary: "Принять задолженность"
+      #operationId: "debtsUser_idAcceptPOST"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Информация о принятом долге"
+        required: true
+        schema:
+          $ref: "#/definitions/DebtPut"
+      - name: "Auth-Token"
+        in: "header"
+        description: "Токен авторизации"
+        required: true
+        type: "string"
+      responses:
+        202:
+          description: "Долговые отношения приняты"
+          schema:
+            $ref: "#/definitions/DebtResponse"
+        401:
+          description: "Пользователь не авторизован"
+          schema:
+            $ref: "#/definitions/401_ErrorDto"
+        403:
+          description: "Данное действие для пользователя запрещенно"
+          schema:
+            $ref: "#/definitions/403_ErrorDto"
+        404:
+          description: "Пользователь не найден"
+          schema:
+            $ref: "#/definitions/404_ErrorDto"
+        500:
+          description: "Внутренняя ошибка сервера"
+          schema:
+            $ref: "#/definitions/500_ErrorDto"
+    post:
+      tags:
+      - "debts"
+      summary: "Создать долговые отношения"
+      description: "Запрос на создание долговых отношений с пользователем"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Долговые отношения"
+        required: true
+        schema:
+          $ref: "#/definitions/PostDebt"
+      - name: "Auth-Token"
+        in: "header"
+        description: "Токен авторизации"
+        required: true
+        type: "string"
+      responses:
+        201:
+          description: "Отправлена заявка для создания долговых отношений"
+          schema:
+            $ref: "#/definitions/DebtResponse"
+        401:
+          description: "Пользователь не авторизован"
+          schema:
+            $ref: "#/definitions/401_ErrorDto"
+        403:
+          description: "Данное действие для пользователя запрещенно"
+          schema:
+            $ref: "#/definitions/403_ErrorDto"
+        404:
+          description: "Пользователь не найден"
+          schema:
+            $ref: "#/definitions/404_ErrorDto"
+        500:
+          description: "Внутренняя ошибка сервера"
+          schema:
+            $ref: "#/definitions/500_ErrorDto"
+
+  /debts/{debt-id}:
+    delete:
+      tags:
+      - "debts"
+      summary: "Закрыть долговые отношения"
+      description: ""
+      parameters:
+      - name: "Auth-Token"
+        in: "header"
+        description: "Токен авторизации"
+        required: true
+        type: "string"
+      - name: "debt-id"
+        in: "path"
+        description: "Идентификатор долговых отношений"
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "Отправлена заявка для закрытия долговых отношений"
+          schema:
+            $ref: "#/definitions/MetaDto"
+        401:
+          description: "Пользователь не авторизован"
+          schema:
+            $ref: "#/definitions/401_ErrorDto"
+        404:
+          description: "Пользователь не найден"
+          schema:
+            $ref: "#/definitions/404_ErrorDto"
+        500:
+          description: "Внутренняя ошибка сервера"
+          schema:
+            $ref: "#/definitions/500_ErrorDto"
+  /debts/change:
+    put:
+      tags:
+      - "debts"
+      summary: "Изменить размера долга"
+      description: "Запрос на изменение размера долга"
+      #operationId: "debtsUser_idDebtClosePut"
+      parameters:
+      - name: "body"
+        in: "body"
+        description: "Информация об изменении долговых отношениях"
+        schema:
+          $ref: "#/definitions/DebtChange"
+      - name: "Auth-Token"
+        in: "header"
+        description: "Токен авторизации"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Отправлена заявка для изменения долговых отношений"
+          schema:
+            $ref: "#/definitions/DebtResponse"
+        401:
+          description: "Пользователь не авторизован"
+          schema:
+            $ref: "#/definitions/401_ErrorDto"
+        404:
+          description: "Пользователь не найден"
+          schema:
+            $ref: "#/definitions/404_ErrorDto"
+        500:
+          description: "Внутренняя ошибка сервера"
+          schema:
+            $ref: "#/definitions/500_ErrorDto"
+  /login:
+    post:
+      tags:
+      - "registration"
+      summary: "Авторизация"
+      description: "Авторизация пользователя"
+      #operationId: "loginPOST"
+      parameters:
+      - name: "phone"
+        in: "header"
+        description: "Телефон пользователя"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "query"
+        description: "Пароль"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Авторизация прошла успешно"
+          schema:
+            $ref: "#/definitions/UserResponseDto"
+        500:
+          description: "Внутренняя ошибка сервера"
+          schema:
+            $ref: "#/definitions/500_ErrorDto"
+  /registration:
+    get:
+      tags:
+      - "registration"
+      summary: "Проверка корректности данных регистрируемого пользователя"
+      description: "Запрос производит проверку уникальности номера телефона и ника\
+        \ пользователя, а также проводит проверку существования пользователя через код подтверждения (приходит на указанный номер по смс). О\
+        твет на запрос зависит от параметров запроса."
+      operationId: "registrationGET"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "check_phone"
+        in: "query"
+        description: "Номер телефона пользователя"
+        required: false
+        type: "string"
+      - name: "confirm_code"
+        in: "query"
+        description: "Код подтверждения"
+        required: false
+        type: "integer"
+      - name: "TempAuth-Token"
+        in: "header"
+        description: "Временный токен авторизации, приходит в качестве ответа на з\
+          апрос регистрации. Необходимо указывать для запроса на подтвеждения суще\
+          ствования номера телефона"
+        required: false
+        type: "string"
+      responses:
+        200:
+          description: "Запрос проверки уникальности успешно обработан"
+          schema:
+            $ref: "#/definitions/UniqueResponseDto"
+        202:
+          description: "Подтверждение кода прошло успешно"
+          headers:
+            TempAuth-Token:
+              description: "Временный токен авторизации. Используется для подтверждения кода, высланного пользователю"
+              type: "string"
+          schema:
+            $ref: "#/definitions/UserResponseDto"
+        401:
+          description: "Пользователь не авторизован - неверно указан временный ток\
+            ен"
+          schema:
+            $ref: "#/definitions/401_ErrorDto"
+        500:
+          description: "Внутренняя ошибка сервера"
+          schema:
+            $ref: "#/definitions/500_ErrorDto"
+  /user:
+    post:
+      tags:
+      - "registration"
+      summary: "Регистрация"
+      description: "Регистрация пользователя"
+      #operationId: "userPOST"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: Информация о пользователе, которого необходимо зарегистрировать"
+        required: true
+        schema:
+          $ref: "#/definitions/PostUserDto"
+      responses:
+        201:
+          description: "Successful response"
+          headers:
+            TempAuth-Token:
+              type: "string"
+              description: "Временный токен (используется для подтверждения кода, высланного пользователю)"
+          schema:
+            $ref: "#/definitions/UserResponseDto"
+        500:
+          description: "Внутренняя ошибка сервера"
+          schema:
+            $ref: "#/definitions/500_ErrorDto"
+      x-swagger-router-controller: "Registration"
+  /profile/{user-id}:
+    get:
+      tags:
+      - "user"
+      summary: "Профиль пользователя"
+      description: ""
+      parameters:
+      - name: "user-id"
+        in: "path"
+        description: "Идентификатор пользователя"
+        required: true
+        type: "integer"
+      - name: "Auth-Token"
+        in: "header"
+        description: "Токен авторизации"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Профиль пользователя"
+          schema:
+            $ref: "#/definitions/UserResponseDto"
+        401:
+          description: "Пользователь не авторизован"
+          schema:
+            $ref: "#/definitions/401_ErrorDto"
+        404:
+          description: "Пользователь не найден"
+          schema:
+            $ref: "#/definitions/404_ErrorDto"
+        500:
+          description: "Внутренняя ошибка сервера"
+          schema:
+            $ref: "#/definitions/500_ErrorDto"
+definitions:
+  TokenResponseDto:
+    type: "object"
+    properties:
+      meta:
+        description: "Информация об ответе"
+        $ref: "#/definitions/MetaDto"
+  UniqueResponseDto:
+    type: "object"
+    properties:
+      meta:
+        description: "Информация об ответе"
+        $ref: "#/definitions/MetaDto"
+      data:
+        description: "Сведения об уникальности данных"
+        $ref: "#/definitions/UniqueDto"
+  UniqueDto:
+    type: "object"
+    properties:
+      isUnique:
+        type: "boolean"
+        description: "Уникальность логина/телефона"
+  PostGroupInfo:
+    type: "object"
+    required:
+    - "name"
+    - "userIdArray"
+    - "createrId"
+    properties:
+      name:
+        type: "string"
+        description: "Название группы"
+      userIdArray:
+        description: "Массив пользователей"
+        $ref: "#/definitions/UserIdArray"
+      message:
+        type: "string"
+        description: "Сообщение группы"
+      createrId:
+        description: "Идентификатор создателя группы"
+        type: "object"
+        $ref: "#/definitions/UserId"
+  GroupInfoResponse:
+    type: "object"
+    required:
+    - "id"
+    - "name"
+    - "userArray"
+    - "creater"
+    properties:
+      id:
+        type: "integer"
+        description: "Идентификатор группу"
+      name:
+        type: "string"
+        description: "Название группы"
+      userArray:
+        description: "Массив пользователей"
+        $ref: "#/definitions/UserArray"
+      message:
+        type: "string"
+        description: "Сообщение группы"
+      creater:
+        type: "object"
+        $ref: "#/definitions/UserInfo"
+        description: "Создатель группы"
+  UserIdArray:
+    type: "array"
+    items:
+      $ref: "#/definitions/UserId"
+  TokenResponse:
+    type: "object"
+    properties:
+      MetaDto:
+        description: "Информация об ответе"
+        $ref: "#/definitions/MetaDto"
+      data:
+        description: "Пользователь"
+        $ref: "#/definitions/Token"
+  Token:
+    type: "object"
+    properties:
+      token:
+        description: "Токен авторизации"
+        type: "string"
+  ErrorResponseMeta:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        description: "Код ответа"
+      status:
+        type: "string"
+        description: "Статус выполнения запроса"
+      message:
+        type: "string"
+        description: "Сообщение сервера"
+  PostUserDto:
+    type: "object"
+    required:
+    - "firstName"
+    - "lastName"
+    - "password"
+    - "phone"
+    properties:
+      firstName:
+        type: "string"
+        description: "Имя пользователя"
+      lastName:
+        type: "string"
+        description: "Фамилия пользователя"
+      phone:
+        type: "string"
+        description: "Номер телефона"
+      password:
+        type: "string"
+        description: "Пароль пользователя"
+  UserInfo:
+    type: "object"
+    required:
+    - "firstName"
+    - "lastName"
+    - "phone"
+    properties:
+      id:
+        type: "integer"
+        format: "int32"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      phone:
+        type: "string"
+      photoUrl:
+        type: "string"
+  UserId:
+    type: "object"
+    required:
+    - "userId"
+    properties:
+      userId:
+        type: "integer"
+        description: "Идентификатор пользователя"
+  UserResponseDto:
+    type: "object"
+    properties:
+      meta:
+        description: "Информация об ответе"
+        $ref: "#/definitions/MetaDto"
+      data:
+        description: "Пользователь"
+        $ref: "#/definitions/UserInfo"
+  PostDebt:
+    type: "object"
+    required:
+    - "receiverId"
+    - "amount"
+    properties:
+      receiverId:
+        type: "integer"
+        description: "Идентификатор второго пользователя"
+      groupId:
+        type: "integer"
+        description: "Идентификатор группы, которой принадлежит долг"
+      amount:
+        type: "number"
+        description: "Размер долга"
+      comment:
+        type: "string"
+        description: "Комментарий к долговым отношениям"
+  Debt:
+    type: "object"
+    required:
+    - "id"
+    - "creditorId"
+    - "debtorId"
+    - "amount"
+    properties:
+      id:
+        type: "integer"
+        description: "Идентификатор долговых отношений"
+      creditorId:
+        type: "integer"
+        description: "Идентификтор отправителя"
+      debtorId:
+        type: "integer"
+        description: "Идентификатор получателя"
+      groupId:
+        type: "integer"
+        description: "Идентификатор группы, которой принадлежит долг"
+      amount:
+        type: "number"
+        description: "Размер долга"
+      status:
+        type: "string"
+        description: "Статус"
+      comment:
+        type: "string"
+        description: "Комментарий к долговым отношениям"
+      date:
+        type: "string"
+        description: "Дата создания долговых отношений"
+  DebtsArray:
+    type: "array"
+    items:
+      $ref: "#/definitions/Debt"
+  UserArray:
+    type: "array"
+    items:
+      $ref: "#/definitions/UserInfo"
+  MetaDto:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        description: "HTTP-код"
+      status:
+        type: "string"
+        description: "Статус выполнения запроса - success/fail"
+    example:
+      code: "200"
+      status: "success"
+  DebtResponse:
+    type: "object"
+    properties:
+      meta:
+        description: "Информация об ответе"
+        $ref: "#/definitions/MetaDto"
+      data:
+        description: "Долг"
+        $ref: "#/definitions/Debt"
+  DebtsArrayResponse:
+    type: "object"
+    properties:
+      meta:
+        description: "Информация об ответе"
+        $ref: "#/definitions/MetaDto"
+      data:
+        description: "Долг"
+        $ref: "#/definitions/DebtsArray"
+  DebtPut:
+    type: "object"
+    required:
+    - "debtId"
+    properties:
+      debtId:
+        type: "integer"
+        description: "Идентификатор долговых отношений"
+      action:
+        type: "string"
+        description: "Информация о принятии долговых отношений"
+  DebtChange:
+    type: object
+    properties:
+      debtId:
+        type: "integer"
+        description: "Идентификатор долговых отношений"
+      amount:
+        type: "number"
+        description: "Размер изменения суммы долга"
+  401_ErrorDto:
+    type: "object"
+    properties:
+      meta:
+        description: "Информация об ответе"
+        $ref: "#/definitions/ErrorResponseMeta"
+    example:
+      meta:
+        code: 401
+        status: "fail"
+        message: "Unauthorized user"
+  403_ErrorDto:
+    type: "object"
+    properties:
+      meta:
+        description: "Информация об ответе"
+        $ref: "#/definitions/ErrorResponseMeta"
+    example:
+      meta:
+        code: 403
+        status: "fail"
+        message: "Banned user"
+  404_ErrorDto:
+    type: "object"
+    properties:
+      meta:
+        description: "Информация об ответе"
+        $ref: "#/definitions/ErrorResponseMeta"
+    example:
+      meta:
+        code: 404
+        status: "fail"
+        message: "Not found"
+  500_ErrorDto:
+    type: "object"
+    properties:
+      meta:
+        description: "Информация об ответе"
+        $ref: "#/definitions/ErrorResponseMeta"
+    example:
+      meta:
+        code: 500
+        status: "fail"
+        message: "IllegalArgumentException"
