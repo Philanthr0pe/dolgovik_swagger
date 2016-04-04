@@ -30,16 +30,21 @@ paths:
         description: "Идентификатор оповещения (группы / долговых отношений / пользователя)"
         required: true
         type: "integer"
-      - name: "Auth-Token"
-        in: "header"
+      - in: "header"
+        name: "Auth-Token"
         description: "Токен авторизации"
+        required: true
+        type: "string"
+      - in: "query"
+        name: "type"
+        description: "Тип идентификатора(группы / долговых отношений / пользователя)"
         required: true
         type: "string"
       responses:
         200:
           description: "Пользователь добавлен в спам"
           schema:
-            $ref: "#/definitions/UserDto"
+            $ref: "#/definitions/MetaDto"
         401:
           description: "Пользователь не авторизован"
           schema:
