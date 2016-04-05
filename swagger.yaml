@@ -241,7 +241,6 @@ paths:
           description: "Внутренняя ошибка сервера"
           schema:
             $ref: "#/definitions/500_ErrorDto"
-
   /debts/{debt-id}:
     delete:
       tags:
@@ -325,7 +324,7 @@ paths:
         required: true
         type: "string"
       - name: "password"
-        in: "query"
+        in: "header"
         description: "Пароль"
         required: true
         type: "string"
@@ -334,6 +333,10 @@ paths:
           description: "Авторизация прошла успешно"
           schema:
             $ref: "#/definitions/UserResponseDto"
+          headers:
+            Auth-Token:
+              type: "string"
+              description: "Токен авторизации"
         500:
           description: "Внутренняя ошибка сервера"
           schema:
