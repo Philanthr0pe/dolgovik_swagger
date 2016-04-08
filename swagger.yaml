@@ -358,16 +358,9 @@ paths:
         description: "Номер телефона пользователя"
         required: false
         type: "string"
-      - name: "confirm_code"
+      - name: "for_confirm"
         in: "query"
-        description: "Код подтверждения"
-        required: false
-        type: "integer"
-      - name: "TempAuth-Token"
-        in: "header"
-        description: "Временный токен авторизации, приходит в качестве ответа на з\
-          апрос регистрации. Необходимо указывать для запроса на подтвеждения суще\
-          ствования номера телефона"
+        description: "Номер телефона пользователя. После отправки запроса с данным параметром пользователю приходит смс."
         required: false
         type: "string"
       responses:
@@ -376,13 +369,13 @@ paths:
           schema:
             $ref: "#/definitions/UniqueResponseDto"
         202:
-          description: "Подтверждение кода прошло успешно"
+          description: "Запрос на получение кода подтверждения прошел успешно."
+          schema:
+            $ref: "#/definitions/EmptyResponseDto"
           headers:
             TempAuth-Token:
               description: "Временный токен авторизации. Используется для подтверждения кода, высланного пользователю"
               type: "string"
-          schema:
-            $ref: "#/definitions/UserResponseDto"
         401:
           description: "Пользователь не авторизован - неверно указан временный ток\
             ен"
@@ -400,6 +393,16 @@ paths:
       description: "Регистрация пользователя"
       #operationId: "userPOST"
       parameters:
+      - name: "Confirm-Code"
+        in: "header"
+        description: "Код подтверждения"
+        required: true
+        type: "integer"
+      - name: "TempAuth-Token"
+        in: "header"
+        description: "Временный токен авторизации"
+        required: true
+        type: "string"
       - in: "body"
         name: "body"
         description: Информация о пользователе, которого необходимо зарегистрировать"
@@ -408,11 +411,7 @@ paths:
           $ref: "#/definitions/PostUserDto"
       responses:
         201:
-          description: "Successful response"
-          headers:
-            TempAuth-Token:
-              type: "string"
-              description: "Временный токен (используется для подтверждения кода, высланного пользователю)"
+          description: "Регистрация прошла успешно"
           schema:
             $ref: "#/definitions/UserResponseDto"
         500:
@@ -455,6 +454,12 @@ paths:
           schema:
             $ref: "#/definitions/500_ErrorDto"
 definitions:
+  EmptyResponseDto:
+    type: "object"
+    properties:
+      meta:
+        description: "Информация об ответе"
+        $ref: "#/definitions/MetaDto"
   UniqueResponseDto:
     type: "object"
     properties:
